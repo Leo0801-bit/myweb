@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="线性代数研学室：系统梳理行列式、矩阵、向量、线性方程组、特征值与二次型，支持公式速查、章节讲解、智能练习与错题复习。">
+  <meta name="theme-color" content="#f4f1e9">
+  <title>线代 · 研学室｜线性代数学习站</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%231e3a5f'/%3E%3Cpath d='M20 22h24M20 32h24M20 42h15' stroke='%23f5efe2' stroke-width='5' stroke-linecap='round'/%3E%3Ccircle cx='45' cy='43' r='5' fill='%23d98e4a'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="assets/vendor/katex/katex.min.css">
+  <link rel="stylesheet" href="assets/css/styles.css">
+  <script>
+    (function () {
+      try {
+        var saved = localStorage.getItem('linear-algebra-lab-v1');
+        var state = saved ? JSON.parse(saved) : null;
+        if (state && state.theme) document.documentElement.dataset.theme = state.theme;
+      } catch (e) { /* default theme */ }
+    })();
+  </script>
+</head>
+<body>
+  <a class="skip-link" href="#app">跳到主要内容</a>
+
+  <div class="ambient" aria-hidden="true">
+    <span class="ambient-orb ambient-orb-a"></span>
+    <span class="ambient-orb ambient-orb-b"></span>
+  </div>
+
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar" aria-label="主导航">
+      <a class="brand" href="#/home" data-route="home" aria-label="线代研学室首页">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 40 40" fill="none">
+            <path d="M10 11.5h20M10 20h20M10 28.5h13" stroke="currentColor" stroke-width="3.4" stroke-linecap="round"/>
+            <circle cx="29.5" cy="28.5" r="4" fill="var(--accent)"/>
+          </svg>
+        </span>
+        <span class="brand-copy">
+          <strong>线代 · 研学室</strong>
+          <small>Linear Algebra Studio</small>
+        </span>
+      </a>
+
+      <nav class="side-nav" aria-label="页面导航">
+        <p class="nav-label">学习空间</p>
+        <a class="nav-item" href="#/home" data-route="home">
+          <span class="nav-icon" data-icon="home"></span><span>学习首页</span>
+        </a>
+        <a class="nav-item" href="#/learn" data-route="learn">
+          <span class="nav-icon" data-icon="book"></span><span>知识课程</span>
+          <span class="nav-count" id="nav-chapter-count">7</span>
+        </a>
+        <a class="nav-item" href="#/formulas" data-route="formulas">
+          <span class="nav-icon" data-icon="formula"></span><span>公式手册</span>
+        </a>
+        <a class="nav-item" href="#/practice" data-route="practice">
+          <span class="nav-icon" data-icon="practice"></span><span>习题练习</span>
+        </a>
+        <p class="nav-label nav-label-spaced">回顾与成长</p>
+        <a class="nav-item" href="#/wrongbook" data-route="wrongbook">
+          <span class="nav-icon" data-icon="flag"></span><span>错题本</span>
+          <span class="nav-badge hidden" id="nav-mistake-count">0</span>
+        </a>
+        <a class="nav-item" href="#/report" data-route="report">
+          <span class="nav-icon" data-icon="chart"></span><span>学习报告</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-progress">
+        <div class="sidebar-progress-head">
+          <span>总学习进度</span>
+          <strong id="side-progress-pct">0%</strong>
+        </div>
+        <div class="progress-track" role="progressbar" aria-label="总学习进度" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="side-progress-track">
+          <span class="progress-fill" id="side-progress-fill"></span>
+        </div>
+        <p id="side-progress-note">从第一章开始，建立你的知识地图。</p>
+      </div>
+
+      <div class="sidebar-foot">
+        <span class="streak-dot" aria-hidden="true"></span>
+        <span id="side-streak">今日还未学习</span>
+      </div>
+    </aside>
+
+    <button class="sidebar-scrim" id="sidebar-scrim" aria-label="关闭导航" tabindex="-1"></button>
+
+    <div class="main-shell">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="icon-btn menu-btn" id="menu-btn" aria-label="打开导航" aria-expanded="false" aria-controls="sidebar">
+            <span data-icon="menu"></span>
+          </button>
+          <div class="breadcrumb" id="breadcrumb" aria-label="面包屑导航">
+            <span>学习首页</span>
+          </div>
+        </div>
+        <div class="topbar-actions">
+          <button class="search-trigger" id="search-trigger" aria-label="搜索知识与公式">
+            <span data-icon="search"></span>
+            <span class="search-trigger-text">搜索知识、公式…</span>
+            <kbd>Ctrl K</kbd>
+          </button>
+          <button class="icon-btn" id="theme-toggle" aria-label="切换深色模式" title="切换主题">
+            <span data-icon="moon" class="theme-icon-moon"></span>
+            <span data-icon="sun" class="theme-icon-sun"></span>
+          </button>
+          <a class="avatar" href="#/report" aria-label="查看学习报告">研</a>
+        </div>
+      </header>
+
+      <main class="page" id="app" tabindex="-1">
+        <noscript>
+          <div class="empty-state"><h2>需要启用 JavaScript</h2><p>本站的课程、公式检索和练习功能需要 JavaScript 才能运行。</p></div>
+        </noscript>
+      </main>
+
+      <footer class="site-footer">
+        <span>线代 · 研学室</span>
+        <span class="footer-sep" aria-hidden="true"></span>
+        <span>把抽象的概念，变成可以推演的画面。</span>
+        <a href="#/about">关于本站</a>
+      </footer>
+    </div>
+  </div>
+
+  <nav class="mobile-tabbar" aria-label="移动端导航">
+    <a href="#/home" data-route="home" class="mobile-tab"><span data-icon="home"></span><span>首页</span></a>
+    <a href="#/learn" data-route="learn" class="mobile-tab"><span data-icon="book"></span><span>课程</span></a>
+    <a href="#/formulas" data-route="formulas" class="mobile-tab"><span data-icon="formula"></span><span>公式</span></a>
+    <a href="#/practice" data-route="practice" class="mobile-tab"><span data-icon="practice"></span><span>练习</span></a>
+    <a href="#/report" data-route="report" class="mobile-tab"><span data-icon="chart"></span><span>报告</span></a>
+  </nav>
+
+  <div class="modal" id="search-modal" role="dialog" aria-modal="true" aria-labelledby="search-title" hidden>
+    <div class="modal-backdrop" data-close-modal></div>
+    <div class="search-panel">
+      <h2 class="sr-only" id="search-title">全站搜索</h2>
+      <div class="search-input-row">
+        <span data-icon="search"></span>
+        <input type="search" id="search-input" placeholder="搜索章节、知识点、公式…" autocomplete="off" spellcheck="false">
+        <button class="esc-key" type="button" data-close-modal>ESC</button>
+      </div>
+      <div class="search-hints" id="search-hints">
+        <span>试试搜索</span>
+        <button type="button" data-search-term="特征值">特征值</button>
+        <button type="button" data-search-term="秩">矩阵的秩</button>
+        <button type="button" data-search-term="正交">正交矩阵</button>
+        <button type="button" data-search-term="克拉默">克拉默法则</button>
+      </div>
+      <div class="search-results" id="search-results" aria-live="polite"></div>
+      <div class="search-footer">
+        <span><kbd>↑</kbd><kbd>↓</kbd> 选择</span>
+        <span><kbd>Enter</kbd> 打开</span>
+        <span><kbd>Esc</kbd> 关闭</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="confirm-modal" role="dialog" aria-modal="true" aria-labelledby="confirm-title" hidden>
+    <div class="modal-backdrop" data-close-confirm></div>
+    <div class="confirm-panel">
+      <span class="confirm-icon" data-icon="alert"></span>
+      <h2 id="confirm-title">确认操作</h2>
+      <p id="confirm-message"></p>
+      <div class="confirm-actions">
+        <button class="btn btn-ghost" type="button" data-close-confirm>取消</button>
+        <button class="btn btn-danger" type="button" id="confirm-accept">确认</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-region" id="toast-region" aria-live="polite" aria-atomic="true"></div>
+
+  <button class="back-to-top" id="back-to-top" type="button" aria-label="回到页面顶部">
+    <span data-icon="arrow-up"></span>
+  </button>
+
+  <script src="assets/vendor/katex/katex.min.js" defer></script>
+  <script src="assets/vendor/katex/contrib/auto-render.min.js" defer></script>
+  <script src="assets/js/lessons.js" defer></script>
+  <script src="assets/js/formulas.js" defer></script>
+  <script src="assets/js/questions.js" defer></script>
+  <script src="assets/js/app.js" defer></script>
+</body>
+</html>
